@@ -6,7 +6,6 @@ A familiar theme for MDM's webkit greeter based on [MDModern by Philipp Miller](
 
 ## Installation
 To use this theme as is, copy the files to a new directory in `/usr/share/mdm/html-themes/`. If you have git, simply type `$ sudo git clone https://github.com/jrha/mdmIRIS.git /usr/share/mdm/html-themes/` in a terminal to copy the files directly from github.
-Rename `default-slideshow.conf` to `slideshow.conf` (see Customizing) and you're all set to select the theme in your MDM settings.
 
 If you plan to edit the theme it may be useful to clone to somewhere else and then create a softlink via `ln -s`. In that case you'll have to make sure, that all files and directories can be read by MDM (set permissions to 777 for directories and 666 for files).
 
