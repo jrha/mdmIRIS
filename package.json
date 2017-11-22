@@ -1,13 +1,12 @@
 {
-  "name": "MDModern",
+  "name": "mdmIRIS",
   "version": "0.1.0",
-  "license": "GPL-3.0+",
-  
+
   "author": {
-    "name": "Philipp Miller",
-    "url": "http://github.com/philer"
+    "name": "James Adams",
+    "url": "http://github.com/jrha/mdmIRIS"
   },
-  
+
   "devDependencies": {
     "grunt": "~0.4.5",
     "load-grunt-tasks": "~3.1.0",
