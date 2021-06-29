@@ -3,96 +3,140 @@
  | MDModern theme for MDM's webkit greeter
  |
  | Copyright (C) 2014 - 2015 Philipp Miller
- | 
+ | Copyright (C) 2017 - 2021 James Adams
+ |
  | This program is free software: you can redistribute it and/or modify
  | it under the terms of the GNU General Public License as published by
  | the Free Software Foundation, either version 3 of the License, or
  | (at your option) any later version.
- | 
+ |
  | This program is distributed in the hope that it will be useful,
  | but WITHOUT ANY WARRANTY; without even the implied warranty of
  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  | GNU General Public License for more details.
- | 
+ |
  | You should have received a copy of the GNU General Public License
  | along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <html>
   <head>
     <meta charset="utf-8">
-    <title>MDModern</title>
+    <title>MDMiris</title>
     <script src="lib/jquery-2.1.3.min.js"></script>
+    <script src="lib/Underscore.js"></script>
     <link rel="stylesheet" href="lib/font-awesome.min.css">
-    <link rel="stylesheet" href="min/MDModern.css">
+    <link rel="stylesheet" href="min/MDMiris.css">
   </head>
   <body>
-    
+
     <div id="panel">
-      
-      <h1 class="lsb-release lsb-distrib-description">$lsb_description</h1>
-      
+
+      <h1 class="sgi">Silicon Graphics</h1>
+
       <nav id="sessionNav">
-        
-        <div id="sessionLabel">$session</div>
-        <div id="session"><!-- current session name --></div>
-        <ul id="sessions"><!-- available sessions list --></ul>
-        
-      </nav><!--<span id="countdown"></span> -->
-      
+
+        <div id="sessionLabel">Session</div>
+        <div id="session">{session}</div>
+        <ul id="sessions"></ul>
+
+      </nav><span id="countdown"></span>
+
       <ul id="menu">
         <li id="languageNav">
-          <a id="language">$language</a>
-          <div class="tooltip"><ul id="languages"><!-- availabel languages list --></ul></div>
+          <a id="language">{language}</a>
+          <ul id="languages" class="tooltip">
+          </ul>
         </li><li id="quit">
           <a>
-            <i class="fa fa-terminal"></i><span class="tooltip">$quit</span>
+            <i class="fa fa-terminal"></i><span class="tooltip">Quit</span>
           </a>
-        </li><li id="suspend">
+        </li>
+        <li id="restart">
           <a>
-            <i class="fa fa-moon-o"></i><span class="tooltip">$suspend</span>
-          </a>
-        </li><li id="restart">
-          <a>
-            <i class="fa fa-refresh"></i><span class="tooltip">$restart</span>
+            <i class="fa fa-refresh"></i><span class="tooltip">Restart</span>
           </a>
         </li><li id="shutdown">
           <a>
-            <i class="fa fa-power-off"></i><span class="tooltip">$shutdown</span>
+            <i class="fa fa-power-off"></i><span class="tooltip">Shutdown</span>
           </a>
         </li>
       </ul>
-      
+
     </div>
-    
-    <div id="wrapper" class="slideshow">
-      
-      <div id="countdown-bar"></div>
-      
-      <ul id="messages"></ul>
-      
-      <form id="login">
-        <img id="face" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><div>
-          <fieldset>
-            <label for="username"><i class="fa fa-user"></i></label>
-            <input type="text"
-                   id="username"
-                   autofocus
-                   autocomplete="off"
-                   />
-            <a class="dropdown-toggle" id="userlist-toggle"><i class="fa fa-caret-down"></i></a>
+
+    <div id="wrapper">
+      <pre id="log"></pre>
+
+      <div id="msg">
+        <div id="msgbox">
+          <div id="msgtitle"></div>
+          <div id="msgtext"></div>
+          <div id="msgicon"></div>
+          <form>
+            <span class="sp_button">
+              <button type="submit" id="msgbtn">Dismiss</button>
+            </span>
+        </form>
+        </div>
+      </div>
+
+      <div id="loginbox">
+        <form id="loginform">
+          <fieldset id="fs_userlist">
             <ul id="users"></ul>
           </fieldset>
-          <fieldset>
-            <label for="password"><i class="fa fa-key"></i></label>
-            <input type="password" id="password" />
-            <button type="submit"><i class="fa fa-check"></i></button>
+          <fieldset id="fs_username">
+            <label for="username">Login name:</label>
+            <span class="sp_input">
+              <input id="username" autofocus="autofocus" type="text">
+            </span>
+            <span id="gecos"></span>
           </fieldset>
-        </div>
-      </form>
-      
+          <fieldset id="fs_password">
+            <label for="password">Password:</label>
+            <span class="sp_input">
+              <input id="password" type="password">
+            </span>
+          </fieldset>
+          <fieldset id="fs_buttons">
+            <span class="sp_button">
+              <button disabled="disabled">Help</button>
+            </span>
+            <span class="sp_button">
+              <button type="submit">Log In</button>
+            </span>
+            <span class="hostname">octane</span>
+          </fieldset>
+        </form>
+      </div>
     </div>
-    
-    <script src="min/MDModern.js"></script>
-    
+
+    <script src="min/MDMiris.js"></script>
+    <script>
+      // test data
+      if (debug) {
+        mdm_add_user("philer", "Philipp Miller", "");
+        mdm_add_user("abc12345", "James Adams", "");
+        mdm_add_user("jrha", "James Adams", "");
+        mdm_add_user("uno", "First User", "");
+        mdm_add_user("userx", "User X", "Logged in");
+        mdm_set_current_user("philer");
+
+        mdm_add_session("Cinnamon", "cinnamon_file");
+        mdm_add_session("Mate", "mate_file");
+        mdm_add_session("i3", "i3_file");
+        mdm_set_current_session("Cinnamon", "cinnamon_file");
+
+        mdm_add_language("English", "en");
+        mdm_add_language("English (US)", "en_us");
+        mdm_add_language("German", "de_at");
+        mdm_add_language("French", "fr");
+        mdm_set_current_language("English (US)", "en_us");
+        //mdm_error("test");
+
+        mdm_timed("Countdown at 50");
+      }
+    </script>
+
   </body>
 </html>

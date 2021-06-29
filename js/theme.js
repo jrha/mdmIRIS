@@ -1,90 +1,232 @@
 /**
- * Backend for a HTML5 MDM theme. This file only contains key elements
- * that are not handled by other modules.
- * Currently: Error feedback, login count down, quit buttons
- * 
- * globals: jQuery mdm
- * 
+ * Backend for a HTML5 MDM theme.
+ *
  * @author  Philipp Miller
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * 
+ *
  */
-(function(mdm, $) {
-  
+(function($) {
+
   "use strict";
-  
-  var $messages     = $("#messages")
-    , $countdown    = $("#countdown")
-    , $countdownBar = $("#countdown-bar")
-    , countdownMax  = -1
-    ;
-  
-  /// MDM listeners ///
-  
-  mdm.on("message error",  showMessage)
-     .on("loginCountdown", updateCountdown)
-     .on("shutdownHidden", function() { $("#shutdown").hide(); })
-     .on("restartHidden",  function() { $("#restart").hide(); })
-     .on("suspendHidden",  function() { $("#suspend").hide(); })
-     .on("quitHidden",     function() { $("#quit").hide(); })
-     ;
-  
-  /// DOM listeners ///
-  
-  // // hide errors and messages by clicking
-  // $msgBox.click(function() { $(this).fadeOut(); });
-  
+
+  var body           = $(document.body),
+      loginbox       = $("#loginbox"),
+      userlistToggle = $("#userlist-toggle", loginbox),
+      usernameInput  = $("#username", loginbox),
+      passwordInput  = $("#password", loginbox),
+      faceElem       = $("#face", loginbox),
+      usersUl        = $("#users", loginbox),
+      users          = [],
+      selectedUser,
+      countdownElem  = $("#countdown"),
+      msgBox         = $("#msg");
+
+  // custom debug logging
+  if (debug) {
+    debug.logElem($("#log"), true)
+         .log('Theme init on "' + navigator.userAgent + '"');
+  }
+
+  // MDM listeners
+  mdm.on("userAdded",       addUser)
+     .on("userSelected",    selectUserByName)
+     .on("usernamePrompt",  function() { usernameInput.select(); })
+     .on("passwordPrompt",  function() {
+        $('#fs_password').show();
+        passwordInput.select();
+      })
+     .on("shutdownHidden",  function() { $("#shutdown").hide(); })
+     .on("restartHidden",   function() { $("#restart").hide(); })
+     .on("suspendHidden",   function() { $("#suspend").hide(); })
+     .on("quitHidden",      function() { $("#quit").hide(); })
+     .on("loginCountdown",  updateCountdown)
+     .on("error",           showMsg);
+     // .on("error mdm.message mdm.timedMessage", showMsg);
+
+$('#fs_password').hide();
+  // DOM listeners
+
+  // select user by typing in the input field
+  usernameInput.on("propertychange input paste", function(evt) {
+    selectUserByName(evt, $(this).val());
+  });
+
+  $("form", loginbox).submit(login);
+
   $("#shutdown a").click(mdm.shutdown);
   $("#restart a").click(mdm.restart);
   $("#suspend a").click(mdm.suspend);
   $("#quit a").click(mdm.quit);
-  
+
+  // hide errors and messages by clicking
+  $('#msgbtn').click(function() { msgBox.hide(); });
+  msgBox.hide();
+
   /// FUNCTIONS ///
-  
+
+  /**
+   * Gather data and give it to mdm for login
+   *
+   * @param  {event} evt  form submit event
+   */
+  function login(evt) {
+    evt.preventDefault();
+    mdm.login(usernameInput.val(), passwordInput.val());
+  }
+
+  /**
+   * Adds a user to the user list, including
+   * image load and event listeners
+   * @param  {event} evt   optional mdm event
+   * @param  {user}  user  user object
+   */
+  function addUser(evt, user) {
+    var li   = $('<li>'),
+        a    = $('<a>' + user.name + '</a>'),
+        icon = $('<img src="img/user.png">'),
+        img  = new Image();
+
+    usersUl.append(
+      li.append(
+        a.prepend(icon)
+      )
+    );
+
+    if (user.loggedIn) {
+      li.addClass("loggedIn");
+    }
+
+    a.click(function(evt) {
+      selectUser(evt, user);
+    });
+
+    img.loaded = false;
+    img.src = user.avatar;
+    $(img).one("load", function() {
+      icon.remove();
+      a.prepend(img);
+      img.loaded = true;
+    });
+
+    user.li = li;
+    user.img = img;
+    users.push(user);
+    if (users.length === 1) {
+      userlistToggle.one("click", toggleUserlist);
+    }
+
+    if (!selectedUser) {
+      selectedUser = user;
+    }
+  }
+
+  /**
+   * Set a user as selected for login
+   * by passing a username
+   *
+   * @param  {event} evt       mdm event
+   * @param  {string} username
+   */
+  function selectUserByName(evt, username) {
+    selectUser(evt, mdm.getUser(username));
+  }
+
+  /**
+   * Set a user as selected for login
+   * by passing a user object
+   *
+   * @param  {event} evt  mdm or click event
+   * @param  {User}  user
+   */
+  function selectUser(evt, user) {
+    selectedUser.li.removeClass("selected");
+    updateFace(user);
+
+    if (!user) return;
+
+    if (!usernameInput.is(evt.target)) {
+      usernameInput.val(user.name);
+      $('#gecos').text(user.gecos);
+    }
+    user.li.addClass("selected");
+    selectedUser = user;
+  }
+
+  /**
+   * Sets the face image next to the loginbox
+   * if the currently selected user has one.
+   * The relevant file is
+   * /home/{username}/.face
+   *
+   * @param  {User} user   user object
+   */
+  function updateFace(user) {
+    loginbox.removeClass("hasface");
+
+    if (!user) return;
+
+    if (user.img.loaded) {
+      faceElem.attr("src", user.img.src);
+      loginbox.addClass("hasface");
+    } else {
+      $(user.img).one("load", function() {
+        if (user == selectedUser)
+        faceElem.attr("src", user.img.src);
+        loginbox.addClass("hasface");
+      });
+    }
+  }
+
+  /**
+   * Toggle function for the user selection list.
+   * This function recursively listenes to
+   * click events either on the toggle anchor (when closed)
+   * or on the entire body (when expanded).
+   *
+   * @param  {event} evt  click event
+   */
+  function toggleUserlist(evt) {
+    if (!usersUl.expanded) {
+      body.click(toggleUserlist);
+      evt.stopPropagation();
+    }
+    else {
+      body.off("click", toggleUserlist);
+      userlistToggle.one("click", toggleUserlist);
+    }
+    usersUl.toggleClass("expanded");
+    usersUl.expanded = !usersUl.expanded;
+  }
+
   /**
    * Make countdown times visible and set time
-   * 
    * @param  {event} evt   optional
    * @param  {int}   time  time remaining until automatic login
    */
   function updateCountdown(evt, time) {
-    $countdown.text(time);
+    countdownElem.text(time);
   }
-  
-  function updateCountdownBar(evt, time) {
-    if (time > countdownMax) {
-      countdownMax = time;
-      $countdownBar.addClass('running');
-    }
-    $countdownBar.css({ width: (100 * time/countdownMax) + "%" });
-  }
-  
+
   /**
    * Display a regular message to the user
-   * 
    * @param  {event}     evt  optional mdm event
    * @param  {string}    msg
    */
-  function showMessage(evt, msg) {
+  function showMsg(evt, msg) {
     if (!msg) return;
-    
-    var t = new Date();
-    
-    var $msg = $(
-        '<li class="message"><time datetime="'
-      + t.toISOString() + '">'
-      + t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds()
-      + '</time>' + msg + '</li>'
-      );
-    
-    if (evt.namespace === "error") {
-      $msg.addClass("error");
-    }
-    
-    $messages
-      .append($msg)
-      .animate({ scrollTop: $messages.height() }, 500)
-      ;
+    var title = 'Information';
+    if (evt.namespace == "error") {
+      var title = 'Error';
+      msgBox.addClass("error");
+    } else {
+      msgBox.removeClass("error");
+    };
+
+    $('#msgtitle').text(title);
+    $('#msgtext').text(msg);
+    $('input').prop('disabled', true);
+    msgBox.show();
+    $('#msgbtn').focus();
   }
-  
-})(mdm, jQuery);
+
+})(jQuery);

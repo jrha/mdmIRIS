@@ -1,20 +1,25 @@
 @charset "UTF-8";
-/**
- * MDModern Theme main css
- * 
- * @author  Philipp Miller
- * @url     https://github.com/philer/MDModern
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- */
 
-/*** global vars ***/
-
+// vars
 @defaultLineHeight: 1.3rem;
-@highlightBg:       rgba(125, 125, 125, .2);
+@highlightBg: #b98e8e;
 
+@panelHeight: 4rem;
+@panelBgColor: #d6d6d6;
 
-/*** font awesome ***/
+@bevelSize: 3px;
+@bevelHighlight: #ececec;
+@bevelShadow: #919191;
+@bevel: inset @bevelSize @bevelSize 0 @bevelHighlight, inset -@bevelSize -@bevelSize 0 @bevelShadow;
+@bevelInput: @bevelSize @bevelSize 0 @bevelShadow, -@bevelSize -@bevelSize 0 @bevelHighlight;
 
+@loginBoxWidth: 710px;
+@loginBoxHeight: 710px;
+
+@msgBoxWidth: 268px;
+@msgBoxHeight: 192px;
+
+/// font awesome
 @faComment: "\f075";
 .font-awesome(@icon: "") {
   content: @icon;
@@ -22,50 +27,26 @@
   display: inline-block;
 }
 
-/*** general ***/
 
-*,
-a,
-input,
-button
-{
+
+/// RESET
+*, a, input, button {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   border: 0 solid transparent;
-  outline-width: 0;
-  outline-color: transparent;
-  
+  outline-width: 0; outline-color: transparent;
+
   background-color: transparent;
   color: inherit;
-  
+
+  font-family: inherit;
   font-size: 1em;
   line-height: @defaultLineHeight;
-  font-family: inherit;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  
+
   list-style-type: none;
 }
-
-html,
-body
-{
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  
-  font-size: 11px;
-  font-family: "Liberation mono", monospace;
-  
-  color: #ddd;
-  text-shadow: 1px 1px 0 black;
-  background-color: #222;
-}
-
-a,
-button
-{
+a, button {
   cursor: pointer;
   transition-duration: .3s;
   transition-property:
@@ -76,100 +57,504 @@ button
     text-shadow,
     box-shadow;
 }
-
-li.selected {
-  background-color: @highlightBg;
-}
-
-button,
-input
-{
+button, input {
   &::-moz-focus-inner {
     padding: 0;
     border-width: 0;
   }
 }
 
-// thin scrollbars in webkit
-::-webkit-scrollbar,
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-thumb {
-    width: 2px;
-    background-color: transparent;
-    border: 0 transparent;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-}
-::-webkit-scrollbar-button {
-  display: none;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(255,255,255,.3);
+html, body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  font-size: 19px;
+  font-family: "FreeSans", sans;
+  font-weight: bold;
+  color: #000;
+  background-color: #4c719e;
 }
 
-
-/*** layout ***/
-
-#wrapper { z-index: 1000; }
-#panel   { z-index: 2000; }
+#wrapper {
+  z-index: 1000;
+  background-image: url("../img/template.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+#panel {
+  z-index: 2000;
+}
 
 #wrapper {
   position: absolute;
-  // top: 0;
   top: @panelHeight;
   left: 0;
   right: 0;
   bottom: 0;
 }
 
+#panel {
+  position: relative;
+  height: @panelHeight;
+  line-height: @panelHeight;
+  background-color: @panelBgColor;
 
-@import "panel.less";
-@import "login.less";
+  h1,
+  nav,
+  > ul,
+  > ul > li,
+  > ul > li > a,
+  #countdown
+  {
+    display: inline-block;
+    height: @panelHeight;
+    line-height: @panelHeight;
+    vertical-align: middle;
+  }
 
-#countdown-bar {
-  z-index: 100;
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 0;
-  width: 100%;
-  
-  transition: width 1s linear, height .3s;
-  
-  background-color: white;
-  
-  &.running {
-    height: 2px;
-    box-shadow: @panelShadow;
+  span {
+    display: inline-block;
+    line-height: 2em;
+    padding: 0 .5em;
+  }
+
+  a:hover {
+    background-color: rgba(125,125,125,.2);
+  }
+
+  .fa {
+    font-size: 1.5rem;
+    line-height: @panelHeight;
+    vertical-align: middle;
+    padding: 0 .5em;
+  }
+
+  h1 {
+    position: absolute;
+    left: .5*@panelHeight;
+    font-size: 1.2rem;
+  }
+
+  #menu {
+    position: absolute;
+    right: .5*@panelHeight;
+
+    // border-left: 1px solid black;
+    > li {
+      position: relative;
+      // border-right: 1px solid black;
+      //border-left: @panelHighlight;
+      &:last-child {
+        //border-right: @panelHighlight;
+      }
+
+      min-width: @panelHeight;
+
+      > a {
+        min-width: @panelHeight;
+        padding: 0 1rem;
+        font-size: 1.2rem;
+      }
+    }
+
+    .tooltip {
+      position: absolute;
+      top: @panelHeight;
+      right: 0;
+      margin-top: 10px;
+
+      background-color: @panelBgColor;
+      box-shadow: 1px 1px 5px rgba(0,0,0,.4);
+      border-radius: 2px;
+
+      visibility: hidden;
+      opacity: 0;
+      transition-duration: .5s;
+      transition-delay: .1s;
+      transition-property: top, opacity, visibility;
+
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: -20px;
+        right: 10px;
+        height: 0;
+        width: 0;
+        border: 10px solid transparent;
+        border-bottom-color: @panelBgColor;
+      }
+    }
+    li:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  #countdown {
+    font-size: 1.75em;
+    font-weight: bold;
+    line-height: @panelHeight;
+    width: @panelHeight;
+
+    // keep sessions aligned to center
+    margin-right: -@panelHeight;
   }
 }
 
-#messages {
-  z-index: 100;
-  position: absolute;
-  margin: 2rem 25%;
-  width: 50%;
-  height: calc(50% - (2rem + .5*@loginHeight + 2rem));
-  
-  overflow: auto;
-  
-  .message {
-    margin: .25em;
-    padding: 1em;
-    background-color: rgba(10,10,10,.8);
-    border-radius: 3px;
-    
-    // &.error {
-    //   color: #faa;
-    // }
-    
-    > time {
+#sessionNav {
+  z-index: 700;
+  position: relative;
+  min-width: 3*@panelHeight;
+}
+#sessionLabel, #session {
+  z-index: 1;
+  position: relative;
+  display: block;
+  height: @defaultLineHeight;
+  line-height: @defaultLineHeight;
+  box-sizing: content-box;
+  background-color: @panelBgColor;
+}
+#sessionLabel {
+  padding-top: .5*@panelHeight - @defaultLineHeight;
+}
+#session {
+  padding: 0 1rem .5*@panelHeight - @defaultLineHeight;
+}
+#sessions, #session {
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+#sessions {
+  z-index: 0;
+  position: relative;
+  top: -20rem;
+  // max-height: 0;
+  opacity: 0;
+  transition-duration: .5s;
+  transition-property: top, opacity, border, box-shadow;
+
+  overflow: hidden;
+  background-color: @panelBgColor;
+
+  li {
+    margin: 1px 0;
+    &.selected {
+      background-color: rgba(125,125,125,.2);
+    }
+    a {
+      display: block;
+      padding: .66em 1em;
+    }
+  }
+}
+#sessionNav:hover #sessions {
+  // max-height: 30em;
+  top: 0;
+  opacity: 1;
+  border-bottom: 1rem solid @panelBgColor;
+}
+
+#languageNav {
+  position: relative;
+}
+
+#language{
+  font-size: 1.5em;
+  &:before {
+    .font-awesome(@faComment);
+    padding-right: .33em;
+  }
+}
+#languages {
+  white-space: nowrap;
+  text-align: left;
+  a {
+    display: block;
+    line-height: 2em;
+    margin-bottom: 1px;
+    padding: .5em;
+
+    .code {
       opacity: .5;
-      margin-right: .5em;
+      // width: 2em;
+      width: 4em;
     }
   }
 }
 
-@import "slideshow.less";
-@import "console.less";
+/*** GENERAL THEMING ***/
+
+button {
+  width: 100%;
+  height: 100%;
+  background-color: #999999;
+  border: 1px solid #e1e1e1;
+  border-bottom-color: #4c4c4c;
+  border-right-color: #4c4c4c;
+  box-shadow: inset 1px 1px 0 #cccccc, inset -1px -1px 0 #737373;
+  font-size: 16px;
+}
+button:active {
+  border: 1px solid #e1e1e1;
+  border-top-color: #4c4c4c;
+  border-left-color: #4c4c4c;
+  box-shadow: inset 1px 1px 0 #737373, inset -1px -1px 0 #cccccc;
+  outline-style: none;
+}
+span.sp_button {
+  float: right;
+  border: 1px solid #4c4c4c;
+  border-bottom-color: #252525;
+  border-right-color: #252525;
+  margin: 0 0 0 10px;
+  width: 68px;
+  height: 28px;
+}
+span.sp_input {
+  border: 1px solid #a1a1a1;
+  border-bottom-color: #f2f2f2;
+  border-right-color: #f2f2f2;
+  box-shadow: inset 1px 1px 0 #6b6b6b, inset -1px -1px 0 #d6d6d6;
+  padding: 1px;
+}
+input {
+  width: 221px - 6px;
+  height: 28px;
+  background: #c1c1c1;
+  border: 1px solid #343434;
+  padding-left: 6px;
+}
+input:focus {
+  background-color: #b98e8e;
+  outline-style: none;
+}
+
+/*** LOGIN BOX ***/
+
+#loginbox,
+#loginbox form {
+  height: @loginBoxHeight;
+  width: @loginBoxWidth;
+}
+#loginbox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  // pull back half the box size plus border width
+  margin: -(2px + @loginBoxHeight/2) 0 0 -(2px + @loginBoxWidth/2);
+  box-shadow: @bevel;
+  background-color: @panelBgColor;
+
+  span.hostname {
+    float: left;
+    color: #8d25b0;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 34px;
+    text-transform: capitalize;
+    text-align: left;
+  }
+
+  form {
+    padding: 0;
+    width: @loginBoxWidth - 4px;
+    height: @loginBoxHeight - 4px;
+
+    fieldset {
+      margin: 32px 32px 0 32px;
+      position: relative;
+      display: block;
+      box-sizing: content-box;
+      border-style: none;
+      padding: 0;
+    }
+
+    fieldset#fs_userlist {
+      width: @loginBoxWidth - 64px;
+      height: 490px;
+      border: 1px solid #a1a1a1;
+      border-bottom-color: #f2f2f2;
+      border-right-color: #f2f2f2;
+      box-shadow: inset 1px 1px 0 #6b6b6b, inset -1px -1px 0 #d6d6d6;
+      background-color: #c1c1c1;
+    }
+
+    fieldset#fs_username {
+      margin-top: 16px;
+    }
+
+    fieldset#fs_password {
+      margin-top: 4px;
+    }
+
+    fieldset#fs_buttons {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 32px;
+    }
+
+    input, label, button, #userlist-toggle {
+      display: block;
+    }
+    label {
+      width: 128px;
+      padding-right: 8px;
+      line-height: 32px;
+      text-align: right;
+    }
+    label, span.sp_input {
+      float: left;
+    }
+    #userlist-toggle {
+      float: right;
+      box-shadow: inset -1px 1px 2px rgba(0, 0, 0, .33);
+    }
+    #username, ul {
+      text-align: left;
+    }
+    #gecos {
+      display: block;
+      padding-left: 8px;
+      line-height: 32px;
+      height: 32px;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    ul {
+      overflow-x: hidden;
+      overflow-y: scroll;
+      width: 100%;
+      height: 100%;
+
+
+      li {
+        margin: 0;
+        width: 126px;
+        float: left;
+
+        a {
+          display: block;
+          text-align: center;
+          line-height: 30px;
+          font-size: 18px;
+
+          img {
+            margin: auto;
+            width: 64px;
+            height: 64px;
+            margin-top: 16px;
+            display: block;
+            background-color: #d5d5d5;
+          }
+        }
+      }
+      li.loggedIn img {
+        background-color: #ad7fa8;
+      }
+      li.loggedIn::after {
+        position: absolute;
+        font-size: 7px;
+        text-align: center;
+        top: 72px;
+        width: 128px;
+        content: "Logged in";
+        color: #2e3436;
+      }
+      li.selected img {
+        background-color: #fce94f;
+      }
+      li:hover img {
+        background-color: #eeeeec;
+      }
+    }
+  }
+}
+
+#msg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  #msgbox {
+    position: absolute;
+    width: @msgBoxWidth;
+    height: @msgBoxHeight;
+    //outline: 2px dashed red;
+    left: 50%;
+    top: 50%;
+    margin-left: -(@msgBoxWidth/2);
+    margin-top: -(@msgBoxHeight/2);
+    background: url("../img/dialog.png") no-repeat;
+    z-index: 3;
+    #msgtitle {
+      position: absolute;
+      //outline: 2px dashed lime;
+      margin: 0;
+      top: 8px;
+      left: 8px;
+      width: 252px;
+      height: 24px;
+      padding: 0 0 0 4px;
+      text-align: left;
+      font-style: italic;
+      font-weight: normal;
+      font-size: 16px;
+      overflow: hidden;
+    }
+    #msgtext {
+      position: absolute;
+      //outline: 2px dashed lime;
+      margin: 0;
+      top: 43px;
+      left: 65px;
+      width: 184px;
+      height: 72px;
+      padding: 4px;
+      text-align: left;
+      font-weight: normal;
+      overflow: hidden;
+    }
+    #msgicon {
+      position: absolute;
+      margin: 0;
+      left: 21px;
+      top: 63px;
+      width: 32px;
+      height: 32px;
+      background-image: url('../img/info.svg');
+    }
+    span.sp_button {
+      position: absolute;
+      left: 91px;
+      top: 134px;
+      //width: 73px;
+      //height: 32px;
+    }
+  }
+  #msgBox.error {
+    #msgicon {
+      background-image: url('../img/error.svg');
+    }
+  }
+}
+
+#log {
+  //position: absolute;
+  width: 100%;
+  height: 20%;
+  padding: 1em;
+  text-align: left;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: 10pt;
+  font-weight: normal;
+  font-family: monospace;
+}
