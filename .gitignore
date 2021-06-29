@@ -46,6 +46,7 @@ source/bower_components/
 .dropbox
 .gource.conf
 
+min/
 
 ### OS files ###
 
