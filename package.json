@@ -1,20 +1,21 @@
 {
   "name": "mdmIRIS",
   "version": "0.1.0",
-
   "author": {
     "name": "James Adams",
     "url": "http://github.com/jrha/mdmIRIS"
   },
-
   "devDependencies": {
-    "grunt": ">=1.3.0",
-    "load-grunt-tasks": "~3.1.0",
+    "grunt": "^1.4.1",
+    "grunt-contrib-concat": "~0.5.1",
+    "grunt-contrib-jshint": "~0.11.0",
     "grunt-contrib-less": "~1.0.0",
     "grunt-contrib-uglify": "~0.8.0",
-    "grunt-contrib-concat": "~0.5.1",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-remove-logging": "~0.2.0",
-    "grunt-contrib-jshint": "~0.11.0"
+    "load-grunt-tasks": "~3.1.0"
+  },
+  "dependencies": {
+    "grunt-cli": "^1.4.3"
   }
 }
