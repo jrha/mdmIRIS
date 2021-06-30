@@ -53,11 +53,11 @@
       if (typeof parser === "string") {
         if (!(parsed = cache[filename][parser])) {
           parsed = cache[filename][parser]
-                 = getParserFunction(parser)(cache[filename]["plain"]);
+                 = getParserFunction(parser)(cache[filename].plain);
         }
       } else {
         // custom parse function
-        parsed = parser(cache[filename]["plain"]);
+        parsed = parser(cache[filename].plain);
       }
       if (callback) callback(parsed);
       return config;
@@ -90,7 +90,7 @@
 
     });
     return config;
-  }
+  };
 
   /**
    * Returns a Function that will be used as parser.
@@ -112,7 +112,7 @@
 
       case "json":
         if (JSON) return JSON.parse;
-        else break;
+        break;
 
       case "plain":
       // case "text":
